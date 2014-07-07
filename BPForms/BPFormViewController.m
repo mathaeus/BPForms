@@ -131,11 +131,10 @@
         
 		CGFloat keyboardHeight = (keyboardSize.width > keyboardSize.height) ? keyboardSize.height : keyboardSize.width;
         
-        CGFloat padding = 20;
         // get the existing inset and make the bottom = keyboard height + a padding
         // note that insets.top is 0 (iOS6) and 64 (iOS7)
         UIEdgeInsets insets = self.tableView.contentInset;
-        insets.bottom = keyboardHeight + padding;
+        insets.bottom = keyboardHeight;
 		self.tableView.contentInset = insets;
 		self.tableView.scrollIndicatorInsets = insets;
         
