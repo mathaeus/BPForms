@@ -40,6 +40,7 @@
 @property (nonatomic, strong) NSMutableDictionary *sectionHeaderTitles; // dictionary holding (section, title) pairs
 @property (nonatomic, strong) NSMutableDictionary *sectionFooterTitles; // dictionary holding (section, title) pairs
 
+@property (nonatomic) UIEdgeInsets originalInsets;
 @end
 
 
@@ -133,7 +134,8 @@
         
         // get the existing inset and make the bottom = keyboard height + a padding
         // note that insets.top is 0 (iOS6) and 64 (iOS7)
-        UIEdgeInsets insets = self.tableView.contentInset;
+		self.originalInsets = self.tableView.contentInset;
+        UIEdgeInsets insets = self.originalInsets;
         insets.bottom = keyboardHeight;
 		self.tableView.contentInset = insets;
 		self.tableView.scrollIndicatorInsets = insets;
@@ -147,9 +149,9 @@
 - (void)keyboardWillHide:(NSNotification *)inNotification {
 	if ([self shouldMoveForKeyboard]) {
 		[UIView animateWithDuration:0.25 animations:^{
-            // get the existing inset and reset the bottom to 0
+            // get the existing inset and reset the bottom to the original bottom inset
             UIEdgeInsets insets = self.tableView.contentInset;
-            insets.bottom = 0;
+            insets.bottom = self.originalInsets.bottom;
 			self.tableView.contentInset = insets;
 			self.tableView.scrollIndicatorInsets = insets;
 		}];
