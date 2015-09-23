@@ -384,18 +384,10 @@
     if (cell.shouldReturnBlock) {
         shouldReturn = cell.shouldReturnBlock(cell, textField.text);
     }
-    
-    BPFormInputCell *nextCell = [self nextInputCell:cell];
-    if (!nextCell) {
-        [textField resignFirstResponder];
-    } else {
-        if ([nextCell isKindOfClass:[BPFormInputTextFieldCell class]]) {
-            [((BPFormInputTextFieldCell*)nextCell).textField becomeFirstResponder];
-        } else if ([nextCell isKindOfClass:[BPFormInputTextViewCell class]]) {
-            [((BPFormInputTextViewCell*)nextCell).textView becomeFirstResponder];
-        }
-    }
-    
+
+    // always resign first responder when entering return
+    [textField resignFirstResponder];
+
     [self updateInfoCellBelowInputCell:cell];
     return shouldReturn;
 }
