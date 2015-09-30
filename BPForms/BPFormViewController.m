@@ -269,6 +269,29 @@
     return nil;
 }
 
+- (NSIndexPath *)indexPathForFormCell:(UITableViewCell *)formCell {
+
+    NSParameterAssert([formCell isKindOfClass:[BPFormCell class]]);
+
+    NSUInteger sectionCount = 0;
+    NSUInteger rowCount = 0;
+
+    for (NSArray *section in self.formCells) {
+
+        rowCount = 0;
+
+        for (BPFormCell *cell in section) {
+            if ([formCell isEqual:cell]) {
+                return [NSIndexPath indexPathForRow:rowCount inSection:sectionCount];
+            }
+            rowCount++;
+        }
+        sectionCount++;
+    }
+    NSAssert(NO, @"Could not determine indexPath.");
+    return nil;
+}
+
 #pragma mark - UITableViewDelegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.formCells && (indexPath.section < self.formCells.count) ) {
