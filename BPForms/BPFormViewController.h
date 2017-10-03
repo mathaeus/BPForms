@@ -92,4 +92,5 @@ typedef NS_ENUM(NSInteger, BPFormKeyboardMode) {
  */
 - (BPFormCell *)cellContainingFirstResponder;
 
+- (NSIndexPath *)indexPathForFormCell:(UITableViewCell *)formCell;
 @end

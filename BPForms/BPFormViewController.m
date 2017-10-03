@@ -120,20 +120,16 @@
 
 - (void)keyboardWillShow:(NSNotification *)inNotification {
 	if ([self shouldMoveForKeyboard]) {
-		// make the tableview fit the visible area of the screen, so it's scrollable to all the cells
-		// note: for landscape, the sizes are switched, so we need to use width as height
-		
-		CGSize keyboardSize = [[[inNotification userInfo] objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
-		
-		CGFloat keyboardHeight = (UIDeviceOrientationIsLandscape([[UIDevice currentDevice] orientation])) ? keyboardSize.width : keyboardSize.height;
-        
+		CGFloat keyboardHeightInView = [self keyboardHeightInView:self.tableView keyboardNotification:inNotification];
         CGFloat padding = 20;
-        // get the existing inset and make the bottom = keyboard height + a padding
+        // get the existing inset and make the bottom = keyboard height in view + a padding
         // note that insets.top is 0 (iOS6) and 64 (iOS7)
-        UIEdgeInsets insets = self.tableView.contentInset;
-        insets.bottom = keyboardHeight + padding;
-		self.tableView.contentInset = insets;
-		self.tableView.scrollIndicatorInsets = insets;
+        UIEdgeInsets scrollIndicatorInsets = self.tableView.contentInset;
+        scrollIndicatorInsets.bottom = keyboardHeightInView;
+        UIEdgeInsets contentInsets = self.tableView.contentInset;
+        contentInsets.bottom = keyboardHeightInView + padding;
+		self.tableView.contentInset = contentInsets;
+		self.tableView.scrollIndicatorInsets = scrollIndicatorInsets;
         
         BPFormCell *firstResponderCell = [self cellContainingFirstResponder];
 		NSIndexPath *selectedRow = [self.tableView indexPathForCell:firstResponderCell];
@@ -141,16 +137,40 @@
 	}
 }
 
+- (CGFloat)keyboardHeightInView:(UIView *)view keyboardNotification:(NSNotification *)keyboardNotification {
+
+    CGRect keyboardRect = [self keyboardRectFromKeyboardNotification:keyboardNotification];
+    CGRect keyboardRectInWindow = [[[UIApplication sharedApplication] delegate].window convertRect:keyboardRect fromWindow:nil];
+    CGRect keyboardRectInViewBounds = [view convertRect:keyboardRectInWindow fromView:nil];
+    // take account for scroll view offset
+    CGRect keyboardRectInViewFrame = CGRectMake(0, keyboardRectInViewBounds.origin.y - view.bounds.origin.y, keyboardRectInViewBounds.size.width, keyboardRectInViewBounds.size.height + view.bounds.origin.y);
+    return MAX(0, view.bounds.size.height - keyboardRectInViewFrame.origin.y);
+}
+
+- (CGRect)keyboardRectFromKeyboardNotification:(NSNotification *)keyboardNotification {
+
+    NSValue *frameBeginValue = (keyboardNotification.userInfo)[UIKeyboardFrameEndUserInfoKey];
+    NSParameterAssert([frameBeginValue isKindOfClass:[NSValue class]]);
+    CGRect rawKeyboardRect = [frameBeginValue CGRectValue];
+    return rawKeyboardRect;
+}
+
 - (void)keyboardWillHide:(NSNotification *)inNotification {
 	if ([self shouldMoveForKeyboard]) {
 		[UIView animateWithDuration:0.25 animations:^{
             // get the existing inset and reset the bottom to 0
             UIEdgeInsets insets = self.tableView.contentInset;
-            insets.bottom = 0;
+            insets.bottom = [self bottomInsetWhenKeyboardIsHidden];
 			self.tableView.contentInset = insets;
 			self.tableView.scrollIndicatorInsets = insets;
 		}];
 	}
+}
+
+- (CGFloat)bottomInsetWhenKeyboardIsHidden {
+
+	BOOL isToolBarShowing = self.navigationController.toolbar && !self.navigationController.toolbar.hidden;
+	return isToolBarShowing ? self.navigationController.toolbar.frame.size.height : 0;
 }
 
 - (void)setupTableView {
@@ -191,10 +211,12 @@
     BOOL valid = YES;
     
     for (NSArray *section in self.formCells) {
-        for (BPFormCell *cell in section) {
-            if (BPFormValidationStateInvalid == cell.validationState) {
-                valid = NO;
-                break;
+        for (UITableViewCell *cell in section) {
+            if ([cell isKindOfClass:[BPFormCell class]]) {
+                if (BPFormValidationStateInvalid == ((BPFormCell *)cell).validationState) {
+                    valid = NO;
+                    break;
+                }
             }
         }
     }
@@ -206,7 +228,11 @@
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell isKindOfClass:[BPFormCell class]]) {
             BPFormCell *formCell = (BPFormCell *)cell;
-            // first we check the contentView subviews
+            // first we check the cell itself
+            if ([cell isFirstResponder]) {
+                return formCell;
+            }
+            // then we check the contentView subviews
             for (UIView *subview in formCell.contentView.subviews) {
                 if ([subview isFirstResponder]) {
                     return formCell;
@@ -250,6 +276,29 @@
         }
         return cell;
     }
+    return nil;
+}
+
+- (NSIndexPath *)indexPathForFormCell:(UITableViewCell *)formCell {
+
+    NSParameterAssert([formCell isKindOfClass:[BPFormCell class]]);
+
+    NSUInteger sectionCount = 0;
+    NSUInteger rowCount = 0;
+
+    for (NSArray *section in self.formCells) {
+
+        rowCount = 0;
+
+        for (BPFormCell *cell in section) {
+            if ([formCell isEqual:cell]) {
+                return [NSIndexPath indexPathForRow:rowCount inSection:sectionCount];
+            }
+            rowCount++;
+        }
+        sectionCount++;
+    }
+    NSAssert(NO, @"Could not determine indexPath.");
     return nil;
 }
 
@@ -368,18 +417,10 @@
     if (cell.shouldReturnBlock) {
         shouldReturn = cell.shouldReturnBlock(cell, textField.text);
     }
-    
-    BPFormInputCell *nextCell = [self nextInputCell:cell];
-    if (!nextCell) {
-        [textField resignFirstResponder];
-    } else {
-        if ([nextCell isKindOfClass:[BPFormInputTextFieldCell class]]) {
-            [((BPFormInputTextFieldCell*)nextCell).textField becomeFirstResponder];
-        } else if ([nextCell isKindOfClass:[BPFormInputTextViewCell class]]) {
-            [((BPFormInputTextViewCell*)nextCell).textView becomeFirstResponder];
-        }
-    }
-    
+
+    // always resign first responder when entering return
+    [textField resignFirstResponder];
+
     [self updateInfoCellBelowInputCell:cell];
     return shouldReturn;
 }
