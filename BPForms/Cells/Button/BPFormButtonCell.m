@@ -24,7 +24,7 @@
 
 #import "BPFormButtonCell.h"
 #import "BPAppearance.h"
-#import <Masonry.h>
+#import <Masonry/Masonry.h>
 
 
 @interface BPFormButtonCell ()
@@ -116,11 +116,6 @@
             self.widthConstraint = make.width.equalTo(@(inCustomContentWidth));
         }];
     }
-}
-
-- (CGFloat)cellHeight {
-    CGFloat cellHeight = (self.customCellHeight ?: self.bounds.size.height);
-    return cellHeight;
 }
 
 @end

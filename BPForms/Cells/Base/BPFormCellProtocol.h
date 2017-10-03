@@ -21,17 +21,26 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Foundation/Foundation.h>
+@import Foundation;
+@import UIKit;
 
+/**
+ *  The protocol describes the common behavior of any form cell
+ */
 @protocol BPFormCellProtocol <NSObject>
 
 @required
 
 /**
- *  Getter and setter for cell custom height
+ *  Getter for cell custom height
  */
 - (CGFloat)customCellHeight;
 
+/**
+ *  Setter for cell custom height
+ *
+ *  @param inHeight the new height
+ */
 - (void)setCustomCellHeight:(CGFloat)inHeight;
 
 /**

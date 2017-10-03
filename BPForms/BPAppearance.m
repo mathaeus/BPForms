@@ -43,6 +43,9 @@
     return self;
 }
 
+/**
+ *  Load the default values
+ */
 - (void)loadDefaults {
     self.tableViewBackGroundColor           = [UIColor whiteColor];
     
@@ -66,6 +69,8 @@
     
     self.infoCellHeight = 16.0f;
     self.spaceBetweenCells = 8.0f;
+    
+    self.textFieldSidePadding = 5.0f;
 }
 
 @end

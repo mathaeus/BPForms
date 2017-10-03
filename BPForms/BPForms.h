@@ -1,5 +1,5 @@
 //
-//  BPFormInputTextViewCell.h
+//  BPForms.h
 //
 //  Copyright (c) 2014 Bogdan Poplauschi
 //
@@ -21,16 +21,22 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+// Core
+#import "BPFormCell.h"
+#import "BPFormCellProtocol.h"
+#import "BPFormInfoCell.h"
+
+#import "BPFormButtonCell.h"
 #import "BPFormInputCell.h"
+#import "BPFormInputTextFieldCell.h"
+#import "BPFormInputTextViewCell.h"
 
-/**
- *  Textview input cell
- */
-@interface BPFormInputTextViewCell : BPFormInputCell
+#import "BPAppearance.h"
 
-/**
- *  The textview
- */
-@property (nonatomic, strong) UITextView  *textView;
+#import "BPFormTextField.h"
+#import "BPFormTextView.h"
 
-@end
+#import "BPFormViewController.h"
+
+#import "UITextField+BPForms.h"
+#import "UITextView+BPForms.h"

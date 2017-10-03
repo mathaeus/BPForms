@@ -21,14 +21,30 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import Foundation;
+@import UIKit;
 
+
+/**
+ *  Supported keyboard modes
+ */
 typedef NS_ENUM(NSInteger, BPFormKeyboardMode) {
-	BPFormKeyboardModeAuto      = -1,
-	BPFormKeyboardModeDontMove  = 0,
+    /**
+     *  Move on keyboard action only if the form is not presented inside a popover
+     */
+    BPFormKeyboardModeAuto      = -1,
+    /**
+     *  Never move on keyboard action
+     */
+    BPFormKeyboardModeDontMove  = 0,
+    /**
+     *  Always move on keyboard action
+     */
     BPFormKeyboardModeMove      = 1
 };
 
 @class BPFormCell;
+@class BPFormInputCell;
 
 /**
  *  Main class, represents the form controller
@@ -44,6 +60,16 @@ typedef NS_ENUM(NSInteger, BPFormKeyboardMode) {
  *  Array of arrays of BPFormCell objects. Each element from the ```formCells``` array is a section, having an array of cells.
  */
 @property (nonatomic, strong) NSArray *formCells;
+
+/** 
+ *  Set this to use a custom insets for headers
+ */
+@property (nonatomic, assign) UIEdgeInsets customSectionHeaderInsets;
+
+/** 
+ *  Set this to use a custom insets for footers
+ */
+@property (nonatomic, assign) UIEdgeInsets customSectionFooterInsets;
 
 /**
  *  Set this to use a custom height for headers
@@ -86,11 +112,24 @@ typedef NS_ENUM(NSInteger, BPFormKeyboardMode) {
 - (BOOL)allCellsAreValid;
 
 /**
+ *  Forces the validation on all input fields
+ */
+- (void)forceValidation;
+
+/**
  *  Will return the cell that contains the UI element that is first responder or nil, if none found
  *
  *  @return the cell (or nil)
  */
 - (BPFormCell *)cellContainingFirstResponder;
 
+/**
+ *  Triggers the update (appear/dissapear) of the info cell for a provided cell
+ *
+ *  @param inInputCell the input cell
+ */
+- (void)updateInfoCellBelowInputCell:(BPFormInputCell *)inInputCell;
+
 - (NSIndexPath *)indexPathForFormCell:(UITableViewCell *)formCell;
+
 @end
