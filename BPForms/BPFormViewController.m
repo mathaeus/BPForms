@@ -182,13 +182,23 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
-    
-    [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.equalTo(self.view.mas_width);
-        make.height.equalTo(self.view.mas_height);
-        make.top.equalTo(self.view.mas_top);
-        make.left.equalTo(self.view.mas_left);
-    }];
+
+    if (@available(iOS 11, *)) {
+        self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
+        [NSLayoutConstraint activateConstraints:@[
+             [self.tableView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
+             [self.tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+             [self.tableView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor],
+             [self.tableView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor],
+        ]];
+    }else{
+        [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.width.equalTo(self.view.mas_width);
+            make.height.equalTo(self.view.mas_height);
+            make.top.equalTo(self.view.mas_top);
+            make.left.equalTo(self.view.mas_left);
+        }];
+    }
     
     if ([self.tableView respondsToSelector:@selector(setSeparatorInset:)]) {
         [self.tableView setSeparatorInset:UIEdgeInsetsZero];
