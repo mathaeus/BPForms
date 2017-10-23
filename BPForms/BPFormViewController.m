@@ -184,14 +184,13 @@
     [self.view addSubview:self.tableView];
 
     if (@available(iOS 11, *)) {
-        self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
-        [NSLayoutConstraint activateConstraints:@[
-             [self.tableView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
-             [self.tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-             [self.tableView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor],
-             [self.tableView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor],
-        ]];
-    }else{
+        [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.width.equalTo(self.view.mas_width);
+            make.top.equalTo(self.view.mas_top);
+            make.left.equalTo(self.view.mas_left);
+            make.bottom.equalTo(self.view.mas_safeAreaLayoutGuideBottom);
+        }];
+    } else {
         [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.width.equalTo(self.view.mas_width);
             make.height.equalTo(self.view.mas_height);
