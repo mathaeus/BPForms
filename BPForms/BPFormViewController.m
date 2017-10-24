@@ -185,9 +185,9 @@
 
     if (@available(iOS 11, *)) {
         [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.width.equalTo(self.view.mas_width);
-            make.top.equalTo(self.view.mas_top);
-            make.left.equalTo(self.view.mas_left);
+            make.right.equalTo(self.view.mas_safeAreaLayoutGuideRight);
+            make.top.equalTo(self.view.mas_safeAreaLayoutGuideTop);
+            make.left.equalTo(self.view.mas_safeAreaLayoutGuideLeft);
             make.bottom.equalTo(self.view.mas_safeAreaLayoutGuideBottom);
         }];
     } else {
